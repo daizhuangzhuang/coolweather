@@ -6,7 +6,7 @@
 
     <list>
         <mapping class = "com.coolweather.android.db.Province"/>
-        <mapping class = "com.coolweather.android.db.Citiy"/>
+        <mapping class = "com.coolweather.android.db.City"/>
         <mapping class="com.coolweather.android.db.County"/>
     </list>
 
