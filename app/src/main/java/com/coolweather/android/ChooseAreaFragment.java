@@ -1,6 +1,7 @@
 package com.coolweather.android;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.coolweather.android.db.City;
 import com.coolweather.android.db.County;
 import com.coolweather.android.db.Province;
+import com.coolweather.android.gson.Weather;
 import com.coolweather.android.util.HttpUtil;
 import com.coolweather.android.util.Utility;
 
@@ -111,6 +113,13 @@ public class ChooseAreaFragment extends Fragment {
                     selectedCity = cityList.get(position);
                     queryCounties();
                 }
+                else if (currentLevel == LEVEL_COUNTY){
+                    String weatherId = countyList.get(position).getWeatherId();
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("weather_id", weatherId);
+                    startActivity(intent);
+                    getActivity().finish();
+                }
             }
         });
         //backButton的点击事件
@@ -183,7 +192,7 @@ public class ChooseAreaFragment extends Fragment {
         titleText.setText(selectedCity.getCityName());
         backButton.setVisibility(View.VISIBLE);
         countyList = DataSupport.where("cityid = ?", String.valueOf(selectedCity.getId())).find(County.class);
-        if (countyList.size() > 0 ){
+        if (countyList.size() >0 ){
             dataList.clear();
             for (County county : countyList){
                 dataList.add(county.getCountyName());
@@ -198,6 +207,7 @@ public class ChooseAreaFragment extends Fragment {
             int cityCode = selectedCity.getCityCode();
             String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
             queryFromServer(address, "county");
+            currentLevel = LEVEL_COUNTY;
         }
     }
 
@@ -205,6 +215,7 @@ public class ChooseAreaFragment extends Fragment {
      * 根据传入的地址和类型从服务器上查询市县数据
      */
     private void queryFromServer(String address, final String type){
+        //显示加载进度
         showProgressDialog();
         //发送请求，数据在response中，然后解析
         HttpUtil.sendOkHttpRequest(address, new Callback() {
